@@ -179,7 +179,7 @@ def get_nakivo_data(host_config):
         cert_verify = host_config["cert_verify"]
     except (AttributeError, ValueError, TypeError, KeyError):
         try:
-            # pylint: disable=undefined-variable
+            # pylint: disable=used-before-assignment
             logger.error(f"Bogus host config for {host}")
         except NameError:
             logger.error("Bogus host config")
