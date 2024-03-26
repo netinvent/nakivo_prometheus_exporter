@@ -20,7 +20,11 @@ from fastapi.responses import PlainTextResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi_offline import FastAPIOffline
 from nakivo_prometheus_exporter.prom_parser import load_config_file, get_nakivo_data
-    
+
+
+logger = logging.getLogger()
+
+
 # Make sure we load given config files again
 default_config_file = "nakivo_prometheus_exporter.yaml"
 parser = ArgumentParser()
@@ -37,9 +41,7 @@ args = parser.parse_args()
 if args.config_file:
     config_dict = load_config_file(args.config_file)
 else:
-    config_dict = load_config_file()
-
-logger = logging.getLogger()
+    logger.critical("No configuration file given. Exiting.")
 
 
 app = FastAPIOffline()
@@ -89,6 +91,7 @@ except (KeyError, AttributeError, TypeError):
 async def api_root(auth=Depends(auth_scheme)):
     return {"app": __appname__}
 
+
 @app.get("/metrics", response_class=PlainTextResponse)
 async def get_metrics(auth=Depends(auth_scheme)):
     data = ""
@@ -100,4 +103,3 @@ async def get_metrics(auth=Depends(auth_scheme)):
         return data
     except KeyError:
         logger.critical("Bogus configuration file. Missing nakivo_hosts key.")
-

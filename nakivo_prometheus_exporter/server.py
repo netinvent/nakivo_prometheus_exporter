@@ -14,6 +14,7 @@ __build__ = "2024032601"
 
 import sys
 import os
+
 # Fix dev env module import
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from pathlib import Path
@@ -56,7 +57,6 @@ This is free software, and you are welcome to redistribute it under certain cond
         logger.critical(f"Cannot load config file {config_file}")
         sys.exit(1)
 
-
     config_dict = load_config_file(config_file)
     if not config_dict:
         logger.critical(f"Cannot load configuration file {config_file}")
@@ -81,7 +81,7 @@ This is free software, and you are welcome to redistribute it under certain cond
 
     logger = logger_get_logger()
     # Cannot use gunicorn on Windows
-    if _DEV or os.name == 'nt':
+    if _DEV or os.name == "nt":
         logger.info("Running dev version")
         import uvicorn
 
@@ -118,14 +118,13 @@ This is free software, and you are welcome to redistribute it under certain cond
                 return self.application
 
         server_args = {
-            "workers": 4, # Don't run multiple workers since we don't have shared variables yet (multiprocessing.cpu_count() * 2) + 1,
+            "workers": 4,  # Don't run multiple workers since we don't have shared variables yet (multiprocessing.cpu_count() * 2) + 1,
             "bind": f"{listen}:{port}" if listen else "0.0.0.0:8080",
             "worker_class": "uvicorn.workers.UvicornWorker",
         }
 
-    
     try:
-        if _DEV or os.name == 'nt':
+        if _DEV or os.name == "nt":
             uvicorn.run("nakivo_prometheus_exporter.metrics:app", **server_args)
         else:
             StandaloneApplication(metrics.app, server_args).run()
@@ -136,6 +135,7 @@ This is free software, and you are welcome to redistribute it under certain cond
         logger.error("Program interrupted by error: {}".format(exc))
         logger.critical("Trace:", exc_info=True)
         sys.exit(201)
+
 
 if __name__ == "__main__":
     main()

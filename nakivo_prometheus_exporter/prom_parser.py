@@ -18,7 +18,7 @@ from typing import Union
 from ruamel.yaml import YAML
 from pathlib import Path
 from ofunctions.logger_utils import logger_get_logger
-from nakivo_prometheus_exporter.nakivo_api import NakivoAPI    
+from nakivo_prometheus_exporter.nakivo_api import NakivoAPI
 
 logger = logger_get_logger()
 
@@ -32,7 +32,6 @@ def g(self, path, sep=".", default=None, list_ok=False):
     print(d.g('my.array.keys'))
     """
     return self.mlget(path.split(sep), default=default, list_ok=list_ok)
-
 
 
 def load_config_file(config_file: Path) -> Union[bool, dict]:
@@ -97,7 +96,9 @@ def license_to_prometheus(license_data: dict, host: str):
     except KeyError:
         monitoredvm = 0
     try:
-        expiration = round(license_data["data"]["expiresIn"] / 1000) # milliseconds to seconds
+        expiration = round(
+            license_data["data"]["expiresIn"] / 1000
+        )  # milliseconds to seconds
     except KeyError:
         expiration = 0
 
@@ -160,7 +161,7 @@ def get_vm_backup_result(job_result: dict, host: str, filter_active_only: bool =
             else:
                 num_state = 2
             prom_data += f'nakivo_backup_state{{host="{host}",object="{name}",job_name="{job_name}"}} {num_state}\n'
-            duration = round(vm["lrDuration"] / 1000) # milliseconds to seconds
+            duration = round(vm["lrDuration"] / 1000)  # milliseconds to seconds
             prom_data += f'nakivo_backup_duration{{host="{host}",object="{name}",job_name="{job_name}"}} {duration}\n'
             data_size = vm["lrDataTransferredUncompressed"]
             prom_data += f'nakivo_backup_size{{host="{host}",object="{name}",job_name="{job_name}"}} {data_size}\n'
@@ -178,6 +179,7 @@ def get_nakivo_data(host_config):
         cert_verify = host_config["cert_verify"]
     except (AttributeError, ValueError, TypeError, KeyError):
         try:
+            # pylint: disable=undefined-variable
             logger.error(f"Bogus host config for {host}")
         except NameError:
             logger.error("Bogus host config")
@@ -187,7 +189,7 @@ def get_nakivo_data(host_config):
     if not api.authenticate():
         logger.error(f"Authentication failure for {host} as {username}")
         return False
-    
+
     prom_data = ""
     try:
         license = api.get_license_info()
@@ -202,12 +204,13 @@ def get_nakivo_data(host_config):
     try:
         jobs = api.get_jobs()
         if not jobs:
-            logger.error(f"Cannot get job info for {host}")    
+            logger.error(f"Cannot get job info for {host}")
         else:
             prom_data += get_vm_backup_result(jobs, host)
     except Exception as exc:
         logger.error(f"Cannot retrieve job data for {host}: {exc}")
     return prom_data
+
 
 def main():
     default_config_file = "nakivo_prometheus_exporter.yaml"
@@ -230,18 +233,17 @@ This is free software, and you are welcome to redistribute it under certain cond
     )
 
     args = parser.parse_args()
-     
+
     config_file = Path(args.config_file)
     if not config_file.exists():
         logger.critical(f"Cannot load config file {config_file}")
         sys.exit(1)
 
-
     config = load_config_file(config_file)
     if not config:
         logger.critical(f"Cannot load configuration file {config_file}")
         sys.exit(1)
-    
+
     try:
         for nakivo_host in config["nakivo_hosts"]:
             get_nakivo_data(nakivo_host)
@@ -250,5 +252,7 @@ This is free software, and you are welcome to redistribute it under certain cond
         sys.exit(1)
 
     sys.exit(0)
+
+
 if __name__ == "__main__":
     main()

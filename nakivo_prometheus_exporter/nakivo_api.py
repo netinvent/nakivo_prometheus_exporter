@@ -22,19 +22,22 @@ class NakivoAPI:
     """
     Python bindings for Nakivo API
     """
-    def __init__(self, host: str, username: str, password: str, cert_verify: bool = True):
+
+    def __init__(
+        self, host: str, username: str, password: str, cert_verify: bool = True
+    ):
         if not host:
             msg = "No Nakvio host given"
             logger.critical(msg)
-        
+
         if not username:
             msg = "No nakivo username given"
             logger.critical(msg)
-        
+
         if not password:
             msg = "No nakivo password given"
             logger.critical(msg)
-        
+
         self.host = host
         self.username = username
         self.password = password
@@ -45,7 +48,7 @@ class NakivoAPI:
             msg = f"Cannot create session to {self.host}"
             logger.critical(msg)
             raise ValueError(msg)
-        self.req.endpoint = 'c/router'
+        self.req.endpoint = "c/router"
 
     def authenticate(self):
         payload = {
@@ -54,7 +57,7 @@ class NakivoAPI:
             # data: username, password, remember_me bool
             "data": [self.username, self.password, False],
             "type": "rpc",
-            "tid": 1
+            "tid": 1,
         }
         result = self.req.requestor(action="create", data=payload)
         if not result:
@@ -73,7 +76,7 @@ class NakivoAPI:
             "method": "getLicenseInfo",
             "data": None,
             "type": "rpc",
-            "tid": 1
+            "tid": 1,
         }
         return self.req.requestor(action="create", data=payload)
 
@@ -83,22 +86,21 @@ class NakivoAPI:
             "method": "getBackupRepository",
             "data": [3],
             "type": "rpc",
-            "tid": 1
+            "tid": 1,
         }
         return self.req.requestor(action="create", data=payload)
-
 
     def get_job_list(self):
         payload = {
             "action": "JobSummaryManagement",
             "method": "getGroupInfo",
             # data: [[Groups: int, or None for all groups], clientTimeOffsetToUtc: int, Get Children: bool]
-            "data": [[None],0,True],
+            "data": [[None], 0, True],
             "type": "rpc",
-            "tid": 1
+            "tid": 1,
         }
         return self.req.requestor(action="create", data=payload)
-    
+
     def get_job(self, job_ids: Union[int, List[int]]):
         payload = {
             "action": "JobSummaryManagement",
@@ -106,7 +108,7 @@ class NakivoAPI:
             # [[idList: int], clientTimeOffsetToUtc: int]
             "data": [job_ids, 0],
             "type": "rpc",
-            "tid": 1
+            "tid": 1,
         }
         return self.req.requestor(action="create", data=payload)
 
@@ -121,6 +123,6 @@ class NakivoAPI:
                 logger.error("Cannot get job IDS")
         else:
             logger.error("Obtaining job list failed")
-        
+
         job_result = self.get_job(job_children_ids)
         return job_result
