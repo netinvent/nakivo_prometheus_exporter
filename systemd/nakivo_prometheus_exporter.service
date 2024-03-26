@@ -1,0 +1,15 @@
+[Unit]
+Description=Nakivo B&R Prometheus Exporter
+After=network.target
+
+[Service]
+#User=myuser
+#Group=myuser
+
+# Set this to whatever directory you installed the grafana_webhook_gammu_smsd to
+ExecStart=/usr/local/bin/nakvio_prometheus_exporter --config-file=/etc/nakivo_prometheus_exporter.yaml
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

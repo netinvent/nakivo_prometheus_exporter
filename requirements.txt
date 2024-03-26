@@ -1,0 +1,9 @@
+ruamel.yaml
+ofunctions.requestor>=1.1.0
+ofunctions.logger_utils
+ofunctions.logger_utils>=2.4.0
+gunicorn
+uvicorn[standard]
+fastapi
+fastapi-offline>=1.5.0
+pydantic~=2.6.3

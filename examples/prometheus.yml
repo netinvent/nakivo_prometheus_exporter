@@ -1,0 +1,16 @@
+  - job_name: nakivo_prometheus_exporter
+    scrape_interval: 1h
+    static_configs:
+    - targets:
+      - supervision.local:9119
+    relabel_configs:
+      # remove port from instance, but allow labels to be overridden by sd_config file, see https://stackoverflow.com/>
+      - source_labels: [instance]
+        target_label: __tmp_instance
+        regex: '(.+)'
+        replacement: '${1};'
+      - source_labels: [__tmp_instance, __address__]
+        separator: ''
+        target_label: instance
+        regex: '([^:;]+)((:[0-9]+)?|;(.*))'
+        replacement: '${1}'
