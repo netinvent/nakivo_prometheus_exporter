@@ -9,7 +9,7 @@ __site__ = "https://www.netperfect.fr/nakivo_prometheus_exporter"
 __description__ = "Naviko API Prometheus data exporter"
 __copyright__ = "Copyright (C) 2024 NetInvent"
 __license__ = "GPL-3.0-only"
-__build__ = "2024032601"
+__build__ = "2024040301"
 
 
 import sys
@@ -154,15 +154,17 @@ def get_vm_backup_result(job_result: dict, host: str, filter_active_only: bool =
         for vm in job["objects"]:
             name = vm["sourceName"]
             state = vm["lrState"]
-            # If the state is null, it means that the VM is being saved for the first time
-            if state is None:
-                num_state = 1
-            elif state in ("SUCCEEDED"):
-                num_state = 0
-            elif state in ("RUNNING", "DEMAND", "SCHEDULED", "WAITING"):
-                num_state = 1
+            # States used in prometheus will be 0 = all okay, 1 = warnings, 2 = failures
+            if isinstance(state, str):
+                if state in ("SUCCEEDED"):
+                    num_state = 0
+                elif state in ("RUNNING", "DEMAND", "SCHEDULED", "WAITING"):
+                    num_state = 1
+                else:
+                    num_state = 2
             else:
-                num_state = 2
+                # If lrState is null, it means that the job has not yet been executed once on the child, let's put a warning state by default
+                num_state = 1
             prom_data += f'nakivo_backup_state{{host="{host}",object="{name}",job_name="{job_name}"}} {num_state}\n'
             duration = round(vm["lrDuration"] / 1000)  # milliseconds to seconds
             prom_data += f'nakivo_backup_duration{{host="{host}",object="{name}",job_name="{job_name}"}} {duration}\n'
