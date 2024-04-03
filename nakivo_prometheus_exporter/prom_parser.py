@@ -154,7 +154,10 @@ def get_vm_backup_result(job_result: dict, host: str, filter_active_only: bool =
         for vm in job["objects"]:
             name = vm["sourceName"]
             state = vm["lrState"]
-            if state in ("SUCCEEDED"):
+            # If the state is null, it means that the VM is being saved for the first time
+            if state is None:
+                num_state = 1
+            elif state in ("SUCCEEDED"):
                 num_state = 0
             elif state in ("RUNNING", "DEMAND", "SCHEDULED", "WAITING"):
                 num_state = 1
