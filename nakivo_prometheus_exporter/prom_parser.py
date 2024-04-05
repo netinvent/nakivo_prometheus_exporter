@@ -63,6 +63,7 @@ def intercept_api_errors(api_return: dict, host: str):
     except (IndexError, KeyError, TypeError, AttributeError):
         pass
 
+
 def license_to_prometheus(license_data: dict, host: str):
     """
     Extract Nakivo license status from Job result
