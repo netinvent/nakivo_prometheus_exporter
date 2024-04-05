@@ -5,7 +5,7 @@
 
 __appname__ = "nakivo_prometheus_exporter"
 __author__ = "Orsiris de Jong"
-__site__ = "https://www.netperfect.fr/nakivo_prometheus_exporter"
+__site__ = "https://www.github.com/netinvent/nakivo_prometheus_exporter"
 __description__ = "Naviko API Prometheus data exporter"
 __copyright__ = "Copyright (C) 2024 NetInvent"
 __license__ = "GPL-3.0-only"
@@ -63,7 +63,7 @@ This is free software, and you are welcome to redistribute it under certain cond
         sys.exit(1)
 
     try:
-        logger = logger_get_logger(config_dict["http_server"]["log_file"])
+        logger = logger_get_logger(config_dict["http_server"]["log_file"], debug=_DEBUG)
     except (AttributeError, KeyError, IndexError, TypeError):
         pass
 
