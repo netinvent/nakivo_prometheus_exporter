@@ -17,10 +17,10 @@ from argparse import ArgumentParser
 from typing import Union
 from ruamel.yaml import YAML
 from pathlib import Path
-from ofunctions.logger_utils import logger_get_logger
+from logging import getLogger
 from nakivo_prometheus_exporter.nakivo_api import NakivoAPI
 
-logger = logger_get_logger()
+logger = getLogger()
 
 
 # Monkeypatching ruamel.yaml ordreddict so we get to use pseudo dot notations
@@ -58,6 +58,7 @@ def intercept_api_errors(api_return: dict, host: str):
     try:
         if api_return["type"] == "exception":
             logger.error(f"API replied: {api_return['message']}")
+            logger.debug(f"Full API return: {api_return}")
             return True
     except (IndexError, KeyError, TypeError, AttributeError):
         pass

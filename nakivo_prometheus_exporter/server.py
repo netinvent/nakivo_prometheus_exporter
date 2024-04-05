@@ -26,7 +26,7 @@ from ofunctions.logger_utils import logger_get_logger
 
 
 def main():
-    logger = logger_get_logger()
+    logger = logger_get_logger(debug=_DEBUG)
     _DEV = os.environ.get("_DEV", False)
 
     default_config_file = "nakivo_prometheus_exporter.yaml"
@@ -80,7 +80,6 @@ This is free software, and you are welcome to redistribute it under certain cond
     except (TypeError, KeyError):
         port = None
 
-    logger = logger_get_logger()
     # Cannot use gunicorn on Windows
     if _DEV or os.name == "nt":
         logger.info("Running dev version")
