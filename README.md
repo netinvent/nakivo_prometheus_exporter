@@ -12,6 +12,8 @@ This tool connects to Navkio Backup & Replication API endpoints, and fetches lic
 This project has been tested on Nakivo Backup & Replication v9 and v10.  
 It runs on most Linux flavors that have Python 3.6+, and can even run on Windows.
 
+Requires python-pip for setup via `dnf install python3-pip` or `apt-get install python3-pip`
+
 ## Grafana dashboard
 
 The exporter comes with a basic Grafana Dashboard, showing:
@@ -24,6 +26,10 @@ The exporter comes with a basic Grafana Dashboard, showing:
 ![image](examples/grafana_dashboard_v0.1.png)
 
 ## Quick start
+
+Create a readonly API user (View only role) so your exporter doesn't have more rights than it should.
+![image](examples/nakivo_readonly_user.png)
+
 
 Grab yourself a copy of `nakivo_prometheus_exporter` by running
 ```
@@ -62,7 +68,7 @@ Once running, you might want to check the metrics with:
 curl http://localhost:9119/metrics
 ```
 
-If everything works, you can use the provided systemd service file, copy it into `/etc/systemd/system` and run the service with
+If everything works, you can use the provided systemd service file from the systemd directory, copy it into `/etc/systemd/system` and run the service with
 ```
 systemctl enable --now nakivo_prometheus_exporter
 ```
