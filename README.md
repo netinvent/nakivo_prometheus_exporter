@@ -91,6 +91,14 @@ If some traction is obersved for the project, we might add missing or interestin
 While this typically targets Linux, one can run this exporter on Windows, as single threaded instance without concurrency.
 Running as service can be achieved via nssm.
 
+## Troubleshooting
+
+You can enable debugging in order to have more info with
+```
+export _DEBUG=true
+/usr/local/bin/nakivo_prometheus_exporter -c /etc/nakivo_prometheus.exporter.yaml
+```
+
 ## Like it ?
 
 Write us ;)
