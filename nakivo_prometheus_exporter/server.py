@@ -21,7 +21,7 @@ from pathlib import Path
 from argparse import ArgumentParser
 from nakivo_prometheus_exporter.prom_parser import load_config_file
 from nakivo_prometheus_exporter import metrics
-from nakivo_prometheus_exporter import __debug__
+from nakivo_prometheus_exporter.__debug__ import _DEBUG
 from ofunctions.logger_utils import logger_get_logger
 
 
@@ -64,7 +64,7 @@ This is free software, and you are welcome to redistribute it under certain cond
         sys.exit(1)
 
     try:
-        logger = logger_get_logger(config_dict["http_server"]["log_file"], debug=__debug__._DEBUG)
+        logger = logger_get_logger(config_dict["http_server"]["log_file"], debug=_DEBUG)
     except (AttributeError, KeyError, IndexError, TypeError):
         pass
 
