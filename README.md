@@ -12,6 +12,8 @@ This tool connects to Navkio Backup & Replication API endpoints, and fetches lic
 This project has been tested on Nakivo Backup & Replication v9 and v10.  
 It runs on most Linux flavors that have Python 3.6+, and can even run on Windows.
 
+So far, Nakivo requires you to have an enterprise plus license to be able to use the API.
+
 Requires python-pip for setup via `dnf install python3-pip` or `apt-get install python3-pip`
 
 ## Grafana dashboard

@@ -9,7 +9,7 @@ __site__ = "https://www.github.com/netinvent/nakivo_prometheus_exporter"
 __description__ = "Naviko API Prometheus data exporter"
 __copyright__ = "Copyright (C) 2024 NetInvent"
 __license__ = "GPL-3.0-only"
-__build__ = "2024040301"
+__build__ = "2024040501"
 
 
 import sys
@@ -51,55 +51,69 @@ def load_config_file(config_file: Path) -> Union[bool, dict]:
         return False
 
 
+def intercept_api_errors(api_return: dict, host: str):
+    """
+    Intercept API return and check for errors
+    """
+    try:
+        if api_return["type"] == "exception":
+            logger.error(f"API replied: {api_return['message']}")
+            return True
+    except (IndexError, KeyError, TypeError, AttributeError):
+        pass
+
 def license_to_prometheus(license_data: dict, host: str):
     """
     Extract Nakivo license status from Job result
     """
+    if intercept_api_errors(license_data, host):
+        return False
+
     try:
         installed = 1 if license_data["data"]["installed"] else 0
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         installed = 0
     try:
         client = license_data["data"]["client"]
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         client = None
     try:
         vmcount = license_data["data"]["usedVms"]
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         vmcount = 0
     try:
         sockets = license_data["data"]["usedSockets"]
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         sockets = 0
     try:
         ec2 = license_data["data"]["usedEc2Instances"]
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         ec2 = 0
     try:
         physical_servers = license_data["data"]["usedPhysicalServers"]
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         physical_servers = 0
     try:
         physical_workstations = license_data["data"]["usedPhysicalWorkstations"]
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         physical_workstations = 0
     try:
         o365users = license_data["data"]["usedOffice365Users"]
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         o365users = 0
     try:
         oracledb = license_data["data"]["usedOracleDatabases"]
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         oracledb = 0
     try:
         monitoredvm = license_data["data"]["usedMonitoredVms"]
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         monitoredvm = 0
     try:
         expiration = round(
             license_data["data"]["expiresIn"] / 1000
         )  # milliseconds to seconds
-    except KeyError:
+    except (IndexError, KeyError, TypeError, AttributeError):
         expiration = 0
 
     prom_data = f'# HELP nakivo_license_installed Is the Nakivo instance licensed\n\
@@ -139,6 +153,9 @@ def get_vm_backup_result(job_result: dict, host: str, filter_active_only: bool =
     """
     Extract VM backup status from Nakvio Job result
     """
+    if intercept_api_errors(job_result, host):
+        return False
+
     vm_job_state = []
     prom_data = "# HELP nakivo_backup_state When will the license expire (seconds)\n\
 # TYPE nakivo_backup_state gauge\n\
@@ -205,6 +222,7 @@ def get_nakivo_data(host_config):
             prom_data = license_to_prometheus(license, host)
     except Exception as exc:
         logger.error(f"Cannot retrieve license data for {host}: {exc}")
+        logger.debug("Trace", exc_info=True)
 
     try:
         jobs = api.get_jobs()
@@ -214,6 +232,7 @@ def get_nakivo_data(host_config):
             prom_data += get_vm_backup_result(jobs, host)
     except Exception as exc:
         logger.error(f"Cannot retrieve job data for {host}: {exc}")
+        logger.debug("Trace", exc_info=True)
     return prom_data
 
 
