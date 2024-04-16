@@ -9,7 +9,7 @@ __site__ = "https://www.github.com/netinvent/nakivo_prometheus_exporter"
 __description__ = "Naviko API Prometheus data exporter"
 __copyright__ = "Copyright (C) 2024 NetInvent"
 __license__ = "GPL-3.0-only"
-__build__ = "2024040501"
+__build__ = "2024041601"
 
 
 import sys
@@ -177,7 +177,7 @@ def get_vm_backup_result(job_result: dict, host: str, filter_active_only: bool =
             if isinstance(state, str):
                 if state in ("SUCCEEDED"):
                     num_state = 0
-                elif state in ("RUNNING", "DEMAND", "SCHEDULED", "WAITING"):
+                elif state in ("RUNNING", "DEMAND", "SCHEDULED", "WAITING", "SKIPPED"):
                     num_state = 1
                 else:
                     num_state = 2
