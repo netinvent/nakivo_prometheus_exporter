@@ -60,8 +60,8 @@ def intercept_api_errors(api_return: dict, host: str) -> tuple[bool, str]:
             logger.error(f"API replied: {api_return['message']}")
             logger.debug(f"Full API return: {api_return}")
 
-            prom_data = '# HELP nakivo_api_error\n\
-# TYPE nakivo_api_error gauge\n'
+            prom_data = "# HELP nakivo_api_error\n\
+# TYPE nakivo_api_error gauge\n"
             prom_data += f'nakivo_api_error{{host="{host}"}} 1\n'
             return True, prom_data
     except (IndexError, KeyError, TypeError, AttributeError):
@@ -73,7 +73,7 @@ def license_to_prometheus(license_data: dict, host: str):
     """
     Extract Nakivo license status from Job result
     """
-    has_errors, prom_data =  intercept_api_errors(license_data, host)
+    has_errors, prom_data = intercept_api_errors(license_data, host)
     if has_errors:
         return prom_data
 
@@ -161,7 +161,7 @@ def get_vm_backup_result(job_result: dict, host: str, filter_active_only: bool =
     """
     Extract VM backup status from Nakvio Job result
     """
-    has_errors, prom_data =  intercept_api_errors(job_result, host)
+    has_errors, prom_data = intercept_api_errors(job_result, host)
     if has_errors:
         return prom_data
 
