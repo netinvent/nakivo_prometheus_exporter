@@ -9,7 +9,7 @@ __site__ = "https://www.github.com/netinvent/nakivo_prometheus_exporter"
 __description__ = "Naviko API Prometheus data exporter"
 __copyright__ = "Copyright (C) 2024 NetInvent"
 __license__ = "GPL-3.0-only"
-__build__ = "2024041601"
+__build__ = "2024042501"
 
 
 import sys
@@ -51,7 +51,7 @@ def load_config_file(config_file: Path) -> Union[bool, dict]:
         return False
 
 
-def intercept_api_errors(api_return: dict, host: str):
+def intercept_api_errors(api_return: dict, host: str) -> tuple[bool, str]:
     """
     Intercept API return and check for errors
     """
@@ -59,17 +59,23 @@ def intercept_api_errors(api_return: dict, host: str):
         if api_return["type"] == "exception":
             logger.error(f"API replied: {api_return['message']}")
             logger.debug(f"Full API return: {api_return}")
-            return True
+
+            prom_data = '# HELP nakivo_api_error\n\
+# TYPE nakivo_api_error gauge\n'
+            prom_data += f'nakivo_api_error{{host="{host}"}} 1\n'
+            return True, prom_data
     except (IndexError, KeyError, TypeError, AttributeError):
         pass
+    return False, None
 
 
 def license_to_prometheus(license_data: dict, host: str):
     """
     Extract Nakivo license status from Job result
     """
-    if intercept_api_errors(license_data, host):
-        return False
+    has_errors, prom_data =  intercept_api_errors(license_data, host)
+    if has_errors:
+        return prom_data
 
     try:
         installed = 1 if license_data["data"]["installed"] else 0
@@ -155,8 +161,9 @@ def get_vm_backup_result(job_result: dict, host: str, filter_active_only: bool =
     """
     Extract VM backup status from Nakvio Job result
     """
-    if intercept_api_errors(job_result, host):
-        return False
+    has_errors, prom_data =  intercept_api_errors(job_result, host)
+    if has_errors:
+        return prom_data
 
     vm_job_state = []
     prom_data = "# HELP nakivo_backup_state When will the license expire (seconds)\n\
@@ -209,19 +216,24 @@ def get_nakivo_data(host_config):
             logger.error("Bogus host config")
         return False
 
+    prom_data = "# HELP nakivo_api_authentication Do we have an API auth error\n\
+# TYPE nakivo_api_authentication_error gauge\n"
+
     api = NakivoAPI(host, username, password, cert_verify)
     if not api.authenticate():
         logger.error(f"Authentication failure for {host} as {username}")
-        return False
+        prom_data += f'nakivo_api_authentication_error{{host="{host}"}} 1\n'
+        return prom_data
+    else:
+        prom_data += f'nakivo_api_authentication_error{{host="{host}"}} 0\n'
 
-    prom_data = ""
     try:
         license = api.get_license_info()
         if not license:
             logger.error(f"Cannot get license data for {host}")
-            prom_data = f'nakivo_license_installed{{host="{host}"}} 0'
+            prom_data += f'nakivo_license_installed{{host="{host}"}} 0'
         else:
-            prom_data = license_to_prometheus(license, host)
+            prom_data += license_to_prometheus(license, host)
     except Exception as exc:
         logger.error(f"Cannot retrieve license data for {host}: {exc}")
         logger.debug("Trace", exc_info=True)
