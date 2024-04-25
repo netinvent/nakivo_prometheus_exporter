@@ -29,9 +29,10 @@ The exporter comes with a basic Grafana Dashboard, showing:
 
 ## Quick start
 
-Create a readonly API user (View only role) so your exporter doesn't have more rights than it should.
+Create a readonly API user with `View only` role so your exporter doesn't have more rights than it should.
 ![image](examples/nakivo_readonly_user.png)
-
+Also, you may want to modifiy the `View Only` role to add licensing view permissions in `Permission > Configuation > Licensing > View only`
+![image](examples/nakivo_view_only_role.png)
 
 Grab yourself a copy of `nakivo_prometheus_exporter` by running
 ```
