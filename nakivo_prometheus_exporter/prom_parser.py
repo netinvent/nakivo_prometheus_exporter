@@ -166,12 +166,12 @@ def get_vm_backup_result(job_result: dict, host: str, filter_active_only: bool =
         return prom_data
 
     vm_job_state = []
-    prom_data = "# HELP nakivo_backup_state When will the license expire (seconds)\n\
+    prom_data = "# HELP nakivo_backup_state backup okay (0), warnings (1), failed (2)\n\
 # TYPE nakivo_backup_state gauge\n\
-# HELP nakivo_backup_state Backup duration (seconds)\n\
-# TYPE nakivo_backup_state gauge\n\
-# HELP nakivo_backup_state Backup size (bytes)\n\
-# TYPE nakivo_backup_state gauge\n"
+# HELP nakivo_backup_duration Backup duration (seconds)\n\
+# TYPE nakivo_backup_duration gauge\n\
+# HELP nakivo_backup_size Backup size (bytes)\n\
+# TYPE nakivo_backup_size gauge\n"
     for job in job_result["data"]["children"]:
         if filter_active_only:
             if job["status"] in ("GRAY"):
