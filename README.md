@@ -77,7 +77,7 @@ systemctl enable --now nakivo_prometheus_exporter
 
 ## Caveats
 
-Since on every scraping, the exporter connects to *ALL* Nakivo API endpoints defined in the host section, you should set the scraper interval to something reasonable like 1 hour.
+Since on every scraping, the exporter connects to *ALL* Nakivo API endpoints defined in the host section, you should set the scraper interval to something reasonable like 1 hour, and increase the scrape timeout value to one minute (see the `prometheus.yml` example file).
 
 ## Other caveats
 
