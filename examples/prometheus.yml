@@ -1,5 +1,5 @@
   - job_name: nakivo_prometheus_exporter
-    scrape_interval: 1h
+    scrape_interval: 300s # max time before data is considered stale by Prometheus 
     scrape_timeout: 1m
     static_configs:
     - targets:
