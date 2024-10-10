@@ -9,9 +9,10 @@ __site__ = "https://www.github.com/netinvent/nakivo_prometheus_exporter"
 __description__ = "Naviko API Prometheus data exporter"
 __copyright__ = "Copyright (C) 2024 NetInvent"
 __license__ = "GPL-3.0-only"
-__build__ = "2024032601"
+__build__ = "2024101001"
 
 
+import sys
 import logging
 import secrets
 from argparse import ArgumentParser
@@ -42,6 +43,7 @@ if args.config_file:
     config_dict = load_config_file(args.config_file)
 else:
     logger.critical("No configuration file given. Exiting.")
+    sys.exit(1)
 
 
 app = FastAPIOffline()
